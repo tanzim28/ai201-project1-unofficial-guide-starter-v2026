@@ -25,6 +25,8 @@
      questions your system answers. Write it for someone who has never seen
      this repo.
 
+     The Unofficial Guide is a retrieval-augmented generation (RAG) assistant designed to help visitors and new residents explore regional towns and districts. Built on the `city_guides` corpus, it indexes localized knowledge covering local dining spots, transport schedules, public markets, accessibility, and seasonal events. Users can ask natural language questions and receive accurate answers strictly grounded in source documents, complete with file citations.
+
      Milestone 5. -->
 
 ## Chunking Strategy
@@ -122,9 +124,9 @@ In-corpus queries scored distances between ~0.48 and ~0.56, while out-of-scope q
 
      Milestone 5. -->
 
-**1.**
+**1.** I asked an AI model how to replace the starter's character-based chunker with paragraph splitting. The suggested snippet only used basic string splitting on `\n\n`, which produced several empty whitespace artifacts; I refined the code by adding `.strip()` and a minimum character threshold (`len(para) >= 40`) to drop useless whitespace chunks.
 
-**2.**
+**2.** I used an AI tool to pressure-test my acceptance criteria in `criteria.md`. It pointed out that my original idea for chunk quality was subjective ("chunks read smoothly"), so I replaced it with an objectively testable target requiring that at least 4 of 5 randomly sampled chunks end in terminal punctuation.
 
 <!-- ── Stretch features ─────────────────────────────────────────────────────
      Doing one? Say so here BEFORE you start. A feature this README never
