@@ -29,18 +29,12 @@
 
 ## Chunking Strategy
 
-**Chunk size:**
-**Overlap:**
+**Chunk size:** Variable (~150 to 500 characters, paragraph-based)  
+**Overlap:** 0 characters
 
-<!-- What about YOUR documents made you pick these numbers? Short posts and
-     long sectioned guides don't want the same chunking, and "800 seemed
-     reasonable" earns nothing. Point at something you noticed when you read
-     the documents in Milestone 1.
+The starter chunker used a fixed 800-character window with a 120-character overlap. In the `city_guides` corpus, this arbitrary slicing split distinct advice sections in half, cutting sentences across boundaries and mixing unrelated tips into the same chunk. 
 
-     If you changed your mind partway through, say so and say why. That's worth
-     more than pretending you got it right first time.
-
-     Milestone 3. -->
+I replaced this in `chunker.py::split_documents` by splitting on double newlines (`\n\n`) and filtering fragments under 40 characters. Because the source Markdown guides are already organized into focused, standalone paragraphs, paragraph-level chunking ensures that each indexed chunk represents a complete semantic thought without dragging in unrelated neighboring context.
 
 ## Sample Chunks
 
@@ -53,29 +47,29 @@
 
      Milestone 3. -->
 
-**Chunk 1** — source: `` — produced by: ``
+**Chunk 1** — source: `guide_accessibility.md#0` — produced by: `chunker.py::split_documents`
 
-```
-```
-
-**Chunk 2** — source: `` — produced by: ``
-
-```
+```Getting around the region with limited mobility
 ```
 
-**Chunk 3** — source: `` — produced by: ``
+**Chunk 2** — source: `guide_corry_vale.md#3 ` — produced by: `chunker.py::split_documents`
 
-```
-```
-
-**Chunk 4** — source: `` — produced by: ``
-
-```
+```One pub in the largest village serves food seven days a week. A second, in the third village, opens Thursday to Sunday. There is a farm shop at the valley mouth that sells bread, cheese and little else, and it closes at 4pm. Bring supplies; this is not a place with options.
 ```
 
-**Chunk 5** — source: `` — produced by: ``
+**Chunk 3** — source: `guide_givens_mill.md#3 ` — produced by: `chunker.py::split_documents`
 
+```A tearoom attached to the mill, open 10 to 4 daily except Tuesdays, which sells bread made from the flour ground twenty metres away and is the reason most people come. One pub, food served lunchtimes and Thursday to Saturday evenings.
 ```
+
+**Chunk 4** — source: `guide_marchwood.md#2` — produced by: `chunker.py::split_documents`
+
+```A tram network of four lines, running every 8 minutes on weekdays and every 15 at weekends, until midnight. A day ticket costs less than two single fares and nobody tells you this at the machine. The centre is walkable but the interesting districts are not adjacent to each other.
+```
+
+**Chunk 5** — source: `guide_seasons.md#1 ` — produced by: `chunker.py::split_documents`
+
+```The Kestrelford Saturday market builds back to full size through April.
 ```
 
 ## Sample Answer
@@ -84,26 +78,38 @@
      visible. Milestone 4. -->
 
 **Question:**
-
+What are the best food spots around here?
 **Answer:**
 
+```Based on the provided documents, good food can generally be found one street back from the main visitor areas (such as Corry Lane in Brightwater, Marine Terrace in Pellew Sands, and Halden Bay's harbour front). Specific local highlights include:
+
+Halden Bay's two harbour restaurants for fresh seafood.
+
+Givens Mill's tearoom for bread made from locally ground flour.
+
+Kestrelford's bakery, which sells out by 11am and brings many people back.
+
+Thornby Wells for Sunday lunch (which requires booking a week ahead).
+
+(Sources: guide_eating.md, guide_pellew_sands.md, guide_kestrelford.md)
 ```
-```
 
-**My relevance cutoff:**
+**My relevance cutoff:** 0.60
 
-<!-- The number you set in config.py, and how you got there.
-
-     You ran five questions your corpus covers and the five in OUT_OF_SCOPE
-     that it clearly doesn't, and wrote down the best distance for each. What
-     did those two groups look like? Where was the gap? Put the actual numbers
-     here — the table below wants all ten rows.
-
-     Milestone 4. -->
+In-corpus queries scored distances between ~0.48 and ~0.56, while out-of-scope queries scored above 0.70. Setting the cutoff at 0.60 cleanly accepts relevant city queries while rejecting campus-related or off-topic prompts before calling the model.
 
 | Question | In corpus? | Best distance |
 |---|---|---|
-|  |  |  |
+| By what time does the bakery in Kestrelford typically sell out? | Yes | 0.491 |
+| Where can you find fresh seafood restaurants in Halden Bay? | Yes | 0.523 |
+| What is special about the bread served at the tearoom in Givens Mill? | Yes | 0.485 |
+| How far in advance do you need to book Sunday lunch in Thornby Wells? | Yes | 0.531 |
+| Which street in Brightwater is known for food away from the main visitor areas? | Yes | 0.565 |
+| What is the policy on bringing pets to dorms? | No | 0.742 |
+| How do I add or drop a computer science course during syllabus week? | No | 0.781 |
+| Where can I buy a replacement student parking permit? | No | 0.715 |
+| What are the operating hours for the campus recreation center pool? | No | 0.739 |
+| Who do I contact about a broken microwave in the communal kitchen? | No | 0.763 |
 
 ## How I Used AI
 
